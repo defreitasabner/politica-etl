@@ -1,4 +1,4 @@
-from transform.transformer_proposicoes import TransformerProposicoes
+from .transformer_proposicoes import TransformerProposicoes
 
 
 __all__ = ['TransformerProposicoes']

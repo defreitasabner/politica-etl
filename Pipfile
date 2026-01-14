@@ -6,7 +6,7 @@ name = "pypi"
 [packages]
 requests = "*"
 xmltodict = "*"
-pandas = "*"
+pymongo = "*"
 
 [dev-packages]
 

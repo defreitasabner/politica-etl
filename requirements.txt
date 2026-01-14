@@ -1,0 +1,4 @@
+pymongo
+requests
+xmltodict
+apache-airflow-providers-mongo

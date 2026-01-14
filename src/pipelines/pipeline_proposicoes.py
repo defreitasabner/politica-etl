@@ -26,7 +26,7 @@ class PipelineProposicoes:
 
         data_inicial_formatada = data_inicial.replace('/', '-')
         data_final_formatada = data_final.replace('/', '-')
-        nome_arquivo = f'proposicoes_{data_inicial_formatada}_a_{data_final_formatada}'
+        nome_arquivo = f'{tipo_proposicao.lower()}_{data_inicial_formatada}_a_{data_final_formatada}'
 
         XmlLoader().salvar(xml_proposicoes, nome_arquivo)
         
