@@ -23,8 +23,10 @@ services:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: mysql+mysqldb://airflow:airflow@airflow-db:3306/airflow
       AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+      AIRFLOW__LOGGING__LOGGING_LEVEL: INFO
+      AIRFLOW__LOGGING__FAB_LOGGING_LEVEL: INFO
       AIRFLOW_CONN_MONGO_DEFAULT: mongodb://admin:admin@mongodb:27017/
-      AIRFLOW_CONN_CAMARA_API: https://www.camara.leg.br/SitCamaraWS/Proposicoes.asmx
+      AIRFLOW_CONN_CAMARA_API: https://www.camara.leg.br
     volumes:
       - ./airflow_pipeline/dags:/opt/airflow/dags
       - ./airflow_pipeline/logs:/opt/airflow/logs
