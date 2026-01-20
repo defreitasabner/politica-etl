@@ -26,6 +26,7 @@ services:
       AIRFLOW__LOGGING__LOGGING_LEVEL: INFO
       AIRFLOW__LOGGING__FAB_LOGGING_LEVEL: INFO
       AIRFLOW_CONN_MONGO_DEFAULT: mongodb://admin:admin@mongodb:27017/
+      AIRFLOW_CONN_DATALAKE_DEFAULT: '{"conn_type": "s3", "login": "minioadmin", "password": "minioadmin", "extra": {"host": "http://datalake:9000", "aws_access_key_id": "minioadmin", "aws_secret_access_key": "minioadmin"}}'
       AIRFLOW_CONN_CAMARA_API: https://www.camara.leg.br
     volumes:
       - ./airflow_pipeline/dags:/opt/airflow/dags
@@ -46,6 +47,8 @@ services:
         condition: service_healthy
       mongodb:
         condition: service_started
+      datalake:
+        condition: service_started
 
   mongodb:
     image: mongo:7
@@ -57,6 +60,24 @@ services:
     ports:
       - "27017:27017"
 
+  datalake:
+    image: minio/minio:latest
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - datalake-volume:/data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    entrypoint: /bin/sh
+    command:
+      - -c
+      - |
+        mkdir -p /data/datalake
+        minio server /data --console-address ":9001"
+
 volumes:
   airflow-db-volume:
   mongo-db-volume:
+  datalake-volume:
