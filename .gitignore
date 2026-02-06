@@ -1,3 +1,6 @@
+venv/
+.venv/
 __pycache__/
+airflow_pipeline/logs/
 data/
-TODO.md
+notebooks/

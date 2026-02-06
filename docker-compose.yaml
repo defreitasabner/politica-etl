@@ -1,0 +1,70 @@
+services:
+  airflow-db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: airflow
+      MYSQL_USER: airflow
+      MYSQL_PASSWORD: airflow
+    volumes:
+      - airflow-db-volume:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    command: --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  airflow:
+    build: .
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: mysql+mysqldb://airflow:airflow@airflow-db:3306/airflow
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+      AIRFLOW__LOGGING__LOGGING_LEVEL: INFO
+      AIRFLOW__LOGGING__FAB_LOGGING_LEVEL: INFO
+      AIRFLOW_CONN_MONGO_DEFAULT: mongodb://admin:admin@mongodb:27017/
+      AIRFLOW_CONN_DATALAKE_DEFAULT: '{"conn_type": "s3", "login": "minioadmin", "password": "minioadmin", "extra": {"host": "http://datalake:9000", "aws_access_key_id": "minioadmin", "aws_secret_access_key": "minioadmin"}}'
+      AIRFLOW_CONN_CAMARA_API: https://www.camara.leg.br
+    volumes:
+      - ./airflow_pipeline/dags:/opt/airflow/dags
+      - ./airflow_pipeline/logs:/opt/airflow/logs
+      - ./airflow_pipeline/plugins:/opt/airflow/plugins
+    ports:
+      - "8080:8080"
+    entrypoint: /bin/bash
+    command:
+      - -c 
+      - |
+        airflow db migrate
+        airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email admin@example.com || true
+        airflow scheduler &
+        airflow webserver
+    depends_on:
+      airflow-db:
+        condition: service_healthy
+      datalake:
+        condition: service_started
+
+  datalake:
+    image: minio/minio:latest
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - datalake-volume:/data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    entrypoint: /bin/sh
+    command:
+      - -c
+      - |
+        mkdir -p /data/datalake
+        minio server /data --console-address ":9001"
+
+volumes:
+  airflow-db-volume:
+  datalake-volume:
