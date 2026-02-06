@@ -45,20 +45,8 @@ services:
     depends_on:
       airflow-db:
         condition: service_healthy
-      mongodb:
-        condition: service_started
       datalake:
         condition: service_started
-
-  mongodb:
-    image: mongo:7
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: admin
-    volumes:
-      - mongo-db-volume:/data/db
-    ports:
-      - "27017:27017"
 
   datalake:
     image: minio/minio:latest
@@ -79,5 +67,4 @@ services:
 
 volumes:
   airflow-db-volume:
-  mongo-db-volume:
   datalake-volume:

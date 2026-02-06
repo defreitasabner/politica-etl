@@ -16,7 +16,7 @@ class ProposicoesHook(HttpHook):
 
     def connect(self, url, session):
         params = {
-            'sigla': 'PL',
+            'sigla': ['PL', 'PEC', 'PLP'],
             'numero': '',
             'ano': self.start_time.year,
             'datApresentacaoIni': self.start_time.strftime(self.DATE_FORMAT),
